@@ -169,4 +169,111 @@ else:
     print(num, "is Not Prime")
 ```
 
+Sure. Here are the code solutions one by one as requested:
+
+---
+
+**I. WAP to check whether given number is prime or not**
+
+```python
+num = int(input("Enter a number: "))
+if num <= 1:
+    print("Not a prime number")
+else:
+    is_prime = True
+    for i in range(2, num):
+        if num % i == 0:
+            is_prime = False
+            break
+    if is_prime:
+        print("Prime number")
+    else:
+        print("Not a prime number")
+```
+
+---
+
+**II. WAP to check palindrome for string and number both**
+
+```python
+value = input("Enter a string or number: ")
+if value == value[::-1]:
+    print("Palindrome")
+else:
+    print("Not a palindrome")
+```
+
+---
+
+**III. WAP to check given value (string or number) is Armstrong or not**
+
+```python
+value = input("Enter a number: ")
+if value.isdigit():
+    num = int(value)
+    power = len(value)
+    total = sum(int(digit) ** power for digit in value)
+    if total == num:
+        print("Armstrong number")
+    else:
+        print("Not an Armstrong number")
+else:
+    print("Invalid input: not a number")
+```
+
+---
+
+**IV. WAP of Fibonacci series**
+
+```python
+n = int(input("Enter number of terms: "))
+a, b = 0, 1
+for _ in range(n):
+    print(a, end=' ')
+    a, b = b, a + b
+```
+
+---
+
+**V. Swap two variables without using third variable**
+
+```python
+a = int(input("Enter first number: "))
+b = int(input("Enter second number: "))
+a = a + b
+b = a - b
+a = a - b
+print("After swapping: a =", a, ", b =", b)
+```
+
+---
+
+**VI. Check for even or odd without using % and /**
+
+```python
+num = int(input("Enter a number: "))
+if (num & 1) == 0:
+    print("Even number")
+else:
+    print("Odd number")
+```
+
+---
+
+**VII. Swap three variables without using fourth variable**
+
+```python
+a = int(input("Enter a: "))
+b = int(input("Enter b: "))
+c = int(input("Enter c: "))
+
+a = a + b + c
+b = a - (b + c)
+c = a - (b + c)
+a = a - (b + c)
+
+print("After swapping: a =", a, ", b =", b, ", c =", c)
+```
+
+
 
