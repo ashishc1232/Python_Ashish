@@ -1,22 +1,21 @@
-# app.py - Puri application ek hi file mein!
+# app.py - Simple Flask Expense Tracker
 
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect, url_for
 import sqlite3
 from datetime import datetime
 
-# Flask app banao
 app = Flask(__name__)
 
-# ==================== DATABASE FUNCTIONS ====================
+# ========== DATABASE FUNCTIONS ==========
 
 def get_db():
     """Database connection"""
     conn = sqlite3.connect('expenses.db')
-    conn.row_factory = sqlite3.Row  # Dict jaisa result milega
+    conn.row_factory = sqlite3.Row
     return conn
 
 def init_db():
-    """Database table banao (agar nahi hai to)"""
+    """Create table if not exists"""
     conn = get_db()
     conn.execute('''
         CREATE TABLE IF NOT EXISTS expenses (
@@ -30,22 +29,29 @@ def init_db():
     conn.commit()
     conn.close()
 
-# App start hote hi database banao
+# Initialize database on startup
 init_db()
 
-# ==================== ROUTES (URLs) ====================
+# ========== ROUTES ==========
 
 @app.route('/')
 def home():
-    """
-    Home page - Sabse pehle yeh chalega
-    URL: http://localhost:5000/
-    """
-    # Database se sare expenses nikalo
+    """Home page - show all expenses"""
     conn = get_db()
+    
+    # Get all expenses
     expenses = conn.execute('SELECT * FROM expenses ORDER BY date DESC').fetchall()
     
-    # Category-wise total nikalo
+    # Get monthly total
+    current_month = datetime.now().strftime("%Y-%m")
+    result = conn.execute('''
+        SELECT SUM(amount) as total 
+        FROM expenses 
+        WHERE date LIKE ?
+    ''', (f"{current_month}%",)).fetchone()
+    monthly_total = result['total'] if result['total'] else 0
+    
+    # Get category totals
     category_totals = conn.execute('''
         SELECT category, SUM(amount) as total 
         FROM expenses 
@@ -53,38 +59,23 @@ def home():
         ORDER BY total DESC
     ''').fetchall()
     
-    # Is mahine ka total
-    current_month = datetime.now().strftime("%Y-%m")
-    monthly_total = conn.execute('''
-        SELECT SUM(amount) as total 
-        FROM expenses 
-        WHERE date LIKE ?
-    ''', (f"{current_month}%",)).fetchone()
-    
     conn.close()
     
-    # HTML page ko data bhejo
     return render_template('index.html', 
                          expenses=expenses,
-                         category_totals=category_totals,
-                         monthly_total=monthly_total['total'] if monthly_total['total'] else 0)
+                         monthly_total=monthly_total,
+                         category_totals=category_totals)
 
 @app.route('/add', methods=['POST'])
 def add_expense():
-    """
-    Expense add karo
-    Form submit hone par yeh chalega
-    """
-    # Form se data lo
+    """Add new expense"""
     amount = request.form.get('amount')
     category = request.form.get('category')
     description = request.form.get('description', '')
     
-    # Validate karo
     if not amount or not category:
-        return "Amount aur Category zaroori hai!", 400
+        return "Amount and Category required!", 400
     
-    # Database mein dalo
     conn = get_db()
     current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
@@ -96,48 +87,19 @@ def add_expense():
     conn.commit()
     conn.close()
     
-    # Wapas home page par jao
     return redirect(url_for('home'))
 
-@app.route('/delete/<int:expense_id>')
-def delete_expense(expense_id):
-    """
-    Expense delete karo
-    URL: http://localhost:5000/delete/5
-    """
+@app.route('/delete/<int:id>')
+def delete_expense(id):
+    """Delete expense by ID"""
     conn = get_db()
-    conn.execute('DELETE FROM expenses WHERE id = ?', (expense_id,))
+    conn.execute('DELETE FROM expenses WHERE id = ?', (id,))
     conn.commit()
     conn.close()
     
     return redirect(url_for('home'))
 
-@app.route('/api/expenses')
-def api_expenses():
-    """
-    API - JSON format mein data
-    URL: http://localhost:5000/api/expenses
-    """
-    conn = get_db()
-    expenses = conn.execute('SELECT * FROM expenses ORDER BY date DESC').fetchall()
-    conn.close()
-    
-    # Dict mein convert karo
-    expenses_list = []
-    for expense in expenses:
-        expenses_list.append({
-            'id': expense['id'],
-            'amount': expense['amount'],
-            'category': expense['category'],
-            'description': expense['description'],
-            'date': expense['date']
-        })
-    
-    return jsonify(expenses_list)
-
-# ==================== RUN APPLICATION ====================
+# ========== RUN APP ==========
 
 if __name__ == '__main__':
-    # Development mode mein chalo
-    # debug=True = Code change hone par auto-reload
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True)
