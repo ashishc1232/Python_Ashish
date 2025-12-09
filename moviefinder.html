@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Movie Finder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .search-box {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        .movie-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: flex;
+            gap: 25px;
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .movie-poster {
+            flex-shrink: 0;
+        }
+        .movie-poster img {
+            width: 200px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .movie-info {
+            flex-grow: 1;
+        }
+        .movie-info h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 2em;
+        }
+        .movie-detail {
+            margin: 10px 0;
+            color: #666;
+            line-height: 1.6;
+        }
+        .movie-detail strong {
+            color: #333;
+        }
+        .error {
+            background: #ff6b6b;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            animation: fadeIn 0.5s;
+        }
+        .rating {
+            display: inline-block;
+            background: #ffd700;
+            color: #333;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 Movie Finder</h1>
+
+        <div class="search-box">
+            <form method="POST">
+                <input type="text" name="movie_name" placeholder="Enter movie name..." required>
+                <button type="submit">Search Movie</button>
+            </form>
+        </div>
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+
+        {% if movie %}
+            <div class="movie-card">
+                <div class="movie-poster">
+                    {% if movie.Poster != "N/A" %}
+                        <img src="{{ movie.Poster }}" alt="{{ movie.Title }}">
+                    {% else %}
+                        <img src="https://via.placeholder.com/200x300?text=No+Poster" alt="No poster">
+                    {% endif %}
+                </div>
+                <div class="movie-info">
+                    <h2>{{ movie.Title }}</h2>
+                    <div class="rating">⭐ {{ movie.imdbRating }}/10</div>
+                    <div class="movie-detail"><strong>Year:</strong> {{ movie.Year }}</div>
+                    <div class="movie-detail"><strong>Genre:</strong> {{ movie.Genre }}</div>
+                    <div class="movie-detail"><strong>Director:</strong> {{ movie.Director }}</div>
+                    <div class="movie-detail"><strong>Cast:</strong> {{ movie.Actors }}</div>
+                    <div class="movie-detail"><strong>Plot:</strong> {{ movie.Plot }}</div>
+                    <div class="movie-detail"><strong>Runtime:</strong> {{ movie.Runtime }}</div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
