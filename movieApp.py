@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 # Free API key for OMDB (you can get your own at http://www.omdbapi.com/apikey.aspx)
 API_KEY = "trilogy"  # Demo key with limited requests
-
+# http://www.omdbapi.com/?i=tt3896198&apikey=fecc63b8
 @app.route("/", methods=["GET", "POST"])
 def home():
     movie = None
